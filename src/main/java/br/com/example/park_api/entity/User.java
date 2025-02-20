@@ -6,7 +6,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "users")
@@ -15,11 +14,11 @@ import java.util.UUID;
 @ToString(onlyExplicitlyIncluded = true)
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @EqualsAndHashCode.Include
     @ToString.Include
-    private UUID id;
+    private Long id;
 
     @Column(name = "username", nullable = false, unique = true, length = 100)
     private String username;
