@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -23,5 +25,22 @@ public class UserService {
         return userRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("User not founded.")
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<User> findAll() {
+        return userRepository.findAll();
+    }
+
+    @Transactional
+    public User updatePassword(Long id, String password) {
+        User user = findById(id);
+        user.setPassword(password);
+        return user;
+
+        /*
+        * userRepository.save(user);
+        * This is functional but unnecessary, Hibernate updates
+        * */
     }
 }
