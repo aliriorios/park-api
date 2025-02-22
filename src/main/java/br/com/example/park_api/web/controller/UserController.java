@@ -2,6 +2,9 @@ package br.com.example.park_api.web.controller;
 
 import br.com.example.park_api.entity.User;
 import br.com.example.park_api.service.UserService;
+import br.com.example.park_api.web.dto.UserCreateDto;
+import br.com.example.park_api.web.dto.UserResponseDto;
+import br.com.example.park_api.web.dto.mapper.UserMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,9 +21,9 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(value = "/save")
-    public ResponseEntity<User> saveUser (@RequestBody User user) {
-        User response = userService.save(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ResponseEntity<UserResponseDto> saveUser (@RequestBody UserCreateDto createDto) {
+        User response = userService.save(UserMapper.toUser(createDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponseDto(response));
     }
 
     @GetMapping(value = "/{id}")
