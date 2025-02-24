@@ -4,9 +4,11 @@ import br.com.example.park_api.entity.User;
 import br.com.example.park_api.service.UserService;
 import br.com.example.park_api.web.dto.UserCreateDto;
 import br.com.example.park_api.web.dto.UserResponseDto;
+import br.com.example.park_api.web.dto.UserUpdatePasswordDto;
 import br.com.example.park_api.web.dto.mapper.UserMapper;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +23,15 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(value = "/save")
-    public ResponseEntity<UserResponseDto> saveUser (@RequestBody UserCreateDto createDto) {
-        User response = userService.save(UserMapper.toUser(createDto));
+    public ResponseEntity<UserResponseDto> saveUser (@RequestBody UserCreateDto dto) {
+        User response = userService.save(UserMapper.toUser(dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponseDto(response));
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> findById (@PathVariable Long id) {
+    public ResponseEntity<UserResponseDto> findById (@PathVariable Long id) {
         User response = userService.findById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(UserMapper.toResponseDto(response));
     }
 
     @GetMapping
@@ -39,8 +41,8 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<User> updatePassword (@PathVariable Long id, @RequestBody User user) {
-        User response = userService.updatePassword(id, user.getPassword());
-        return ResponseEntity.ok(response);
+    public ResponseEntity<Void> updatePassword (@PathVariable Long id, @RequestBody UserUpdatePasswordDto dto) {
+        User response = userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmPassword());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

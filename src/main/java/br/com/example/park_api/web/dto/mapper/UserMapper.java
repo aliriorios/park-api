@@ -3,6 +3,7 @@ package br.com.example.park_api.web.dto.mapper;
 import br.com.example.park_api.entity.User;
 import br.com.example.park_api.web.dto.UserCreateDto;
 import br.com.example.park_api.web.dto.UserResponseDto;
+import br.com.example.park_api.web.dto.UserUpdatePasswordDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 
@@ -23,5 +24,9 @@ public class UserMapper {
         );
 
         return mapperMain.map(user, UserResponseDto.class);
+    }
+
+    public static UserUpdatePasswordDto toUpdatePasswordDto(User user) {
+        return new ModelMapper().map(user, UserUpdatePasswordDto.class);
     }
 }
