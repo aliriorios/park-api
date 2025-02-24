@@ -3,9 +3,11 @@ package br.com.example.park_api.web.dto.mapper;
 import br.com.example.park_api.entity.User;
 import br.com.example.park_api.web.dto.UserCreateDto;
 import br.com.example.park_api.web.dto.UserResponseDto;
-import br.com.example.park_api.web.dto.UserUpdatePasswordDto;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserMapper {
 
@@ -26,7 +28,7 @@ public class UserMapper {
         return mapperMain.map(user, UserResponseDto.class);
     }
 
-    public static UserUpdatePasswordDto toUpdatePasswordDto(User user) {
-        return new ModelMapper().map(user, UserUpdatePasswordDto.class);
+    public static List<UserResponseDto> toListResponseDto(List<User> users) {
+        return users.stream().map(UserMapper::toResponseDto).collect(Collectors.toList());
     }
 }

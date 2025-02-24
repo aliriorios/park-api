@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/v1/users")
@@ -35,9 +36,10 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> findAll () {
+    public ResponseEntity<List<UserResponseDto>> findAll () {
         List<User> usersList = userService.findAll();
-        return ResponseEntity.ok(usersList);
+
+        return ResponseEntity.ok(UserMapper.toListResponseDto(usersList));
     }
 
     @PatchMapping(value = "/{id}")
