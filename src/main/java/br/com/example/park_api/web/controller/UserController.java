@@ -6,15 +6,14 @@ import br.com.example.park_api.web.dto.UserCreateDto;
 import br.com.example.park_api.web.dto.UserResponseDto;
 import br.com.example.park_api.web.dto.UserUpdatePasswordDto;
 import br.com.example.park_api.web.dto.mapper.UserMapper;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/v1/users")
@@ -24,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping(value = "/save")
-    public ResponseEntity<UserResponseDto> saveUser (@RequestBody UserCreateDto dto) {
+    public ResponseEntity<UserResponseDto> saveUser (@Valid @RequestBody UserCreateDto dto) {
         User response = userService.save(UserMapper.toUser(dto));
         return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toResponseDto(response));
     }
@@ -43,7 +42,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Void> updatePassword (@PathVariable Long id, @RequestBody UserUpdatePasswordDto dto) {
+    public ResponseEntity<Void> updatePassword (@PathVariable Long id, @Valid @RequestBody UserUpdatePasswordDto dto) {
         User response = userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmPassword());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
