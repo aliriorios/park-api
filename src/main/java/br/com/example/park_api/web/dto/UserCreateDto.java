@@ -13,6 +13,6 @@ public class UserCreateDto {
     private String username;
 
     @NotBlank
-    @Size(min = 6, max = 6)
+    @Size(min = 6, max = 6, message = "Password must contain 6 characters")
     private String password;
 }
