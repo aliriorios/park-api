@@ -1,5 +1,6 @@
 package br.com.example.park_api.web.exception;
 
+import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,6 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorMessage> MethodArgumentNotValidException (MethodArgumentNotValidException e,
                                                                          HttpServletRequest request,
                                                                          BindingResult result) {
-
         log.error("Api Error - ", e); // Slf4j - To view exception trace
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
@@ -27,13 +27,20 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(UsernameUniqueViolationException.class)
-    public ResponseEntity<ErrorMessage> UsernameUniqueViolationException (RuntimeException e,
-                                                                          HttpServletRequest request) {
-
+    public ResponseEntity<ErrorMessage> UniqueViolationException (RuntimeException e, HttpServletRequest request) {
         log.error("Api Error - ", e);
 
         return ResponseEntity.status(HttpStatus.CONFLICT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessage(request, HttpStatus.CONFLICT, e.getMessage()));
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorMessage> NotFoundException (RuntimeException e, HttpServletRequest request) {
+        log.error("Api Error - ", e);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.NOT_FOUND, e.getMessage()));
     }
 }

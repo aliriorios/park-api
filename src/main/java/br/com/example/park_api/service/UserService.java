@@ -1,6 +1,7 @@
 package br.com.example.park_api.service;
 
 import br.com.example.park_api.entity.User;
+import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
 import br.com.example.park_api.repository.UserRepository;
 import lombok.NonNull;
@@ -30,7 +31,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public User findById (Long id) {
         return userRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("User not founded.")
+                () -> new EntityNotFoundException(String.format("User {id=%s} not founded.", id))
         );
     }
 
