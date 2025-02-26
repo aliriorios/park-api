@@ -1,5 +1,6 @@
 package br.com.example.park_api.web.exception;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,10 @@ public class ErrorMessage {
     private int status;
     private String statusText;
     private String message;
+
+    // It will only insert in the conversion to JSON if it is not null.
+    // Useful for non-validation exceptions that do not return objects from error fields.
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> errors;
 
     public ErrorMessage(HttpServletRequest request, HttpStatus status, String message) {

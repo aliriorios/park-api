@@ -1,9 +1,11 @@
 package br.com.example.park_api.service;
 
 import br.com.example.park_api.entity.User;
+import br.com.example.park_api.exception.UsernameUniqueViolationException;
 import br.com.example.park_api.repository.UserRepository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,7 +19,12 @@ public class UserService {
 
     @Transactional
     public User save(User user) {
-        return userRepository.save(user);
+        try {
+            return userRepository.save(user);
+
+        } catch (DataIntegrityViolationException e) {
+            throw new UsernameUniqueViolationException(String.format("Username {%s} already registered.", user.getUsername()));
+        }
     }
 
     @Transactional(readOnly = true)
