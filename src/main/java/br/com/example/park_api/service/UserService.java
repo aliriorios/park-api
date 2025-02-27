@@ -2,6 +2,7 @@ package br.com.example.park_api.service;
 
 import br.com.example.park_api.entity.User;
 import br.com.example.park_api.exception.EntityNotFoundException;
+import br.com.example.park_api.exception.PasswordInvalidException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
 import br.com.example.park_api.repository.UserRepository;
 import lombok.NonNull;
@@ -43,12 +44,12 @@ public class UserService {
     @Transactional
     public User updatePassword(Long id, String currentPassword, String newPassword, String confirmPassword) {
         if (!newPassword.equals(confirmPassword)) {
-            throw new RuntimeException("New password does not match password confirmation.");
+            throw new PasswordInvalidException("New password does not match password confirmation.");
         }
 
         User user = findById(id);
         if (!user.getPassword().equals(currentPassword)) {
-            throw new RuntimeException("The password entered does not match the user's.");
+            throw new PasswordInvalidException("The password entered does not match the user's.");
         }
 
         user.setPassword(newPassword);
