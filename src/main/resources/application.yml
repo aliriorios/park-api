@@ -21,7 +21,14 @@ spring:
           format_sql: true
           dialect: org.hibernate.dialect.MySQL8Dialect
 
+springdoc:
+  swagger-ui:
+    path: /docs-park-api.html
+  api-docs:
+    path: /docs-park-api
+  packagesToScan: br.com.example.park_api.web.controller
+
 logging:
   level:
     root: info
-    org.springframework: debug
+    org.springframework: info
