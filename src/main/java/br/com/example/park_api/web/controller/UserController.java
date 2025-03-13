@@ -57,6 +57,12 @@ public class UserController {
     }
 
     @GetMapping
+    @Operation(
+            summary = "Search for all users", description = "Listing all system users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "All users were found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+            }
+    )
     public ResponseEntity<List<UserResponseDto>> findAll () {
         List<User> usersList = userService.findAll();
 
