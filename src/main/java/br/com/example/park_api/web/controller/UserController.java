@@ -7,6 +7,7 @@ import br.com.example.park_api.web.dto.UserResponseDto;
 import br.com.example.park_api.web.dto.UserUpdatePasswordDto;
 import br.com.example.park_api.web.dto.mapper.UserMapper;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -60,7 +61,8 @@ public class UserController {
     @Operation(
             summary = "Search for all users", description = "Listing all system users",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "All users were found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "200", description = "All users were found",
+                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class))))
             }
     )
     public ResponseEntity<List<UserResponseDto>> findAll () {
