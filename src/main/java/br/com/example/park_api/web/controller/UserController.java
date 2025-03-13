@@ -35,7 +35,7 @@ public class UserController {
             responses = {
                 @ApiResponse(responseCode = "201", description = "Successfully created resource", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
                 @ApiResponse(responseCode = "409", description = "User e-mail already registered in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
-                @ApiResponse(responseCode = "422", description = "Resource Not Processed for Invalid Input Data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+                @ApiResponse(responseCode = "422", description = "Resource Not Processed for invalid input data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
     )
     public ResponseEntity<UserResponseDto> saveUser (@Valid @RequestBody UserCreateDto dto) {
@@ -44,6 +44,13 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
+    @Operation(
+            summary = "Find a user by id", description = "Feature to find an existing user via id",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
     public ResponseEntity<UserResponseDto> findById (@PathVariable Long id) {
         User response = userService.findById(id);
         return ResponseEntity.ok(UserMapper.toResponseDto(response));
