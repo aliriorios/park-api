@@ -3,7 +3,7 @@ services:
     image: mysql:latest
     container_name: park-api
     ports:
-      - "3306:3306"
+      - "3306:3306" # DB main
     environment:
       MYSQL_ROOT_PASSWORD: db-root-dev
       MYSQL_DATABASE: park-api-db
@@ -15,7 +15,7 @@ services:
     restart: always
 
 volumes:
-  park-api-db:
+  park-api-db: {}
 
 # Abra um terminal no diretório do docker-compose e execute:
 # docker-compose up -d

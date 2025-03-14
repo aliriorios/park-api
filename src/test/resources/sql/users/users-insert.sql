@@ -1,3 +1,13 @@
 INSERT INTO users (id, username, password, role) VALUES (100, 'ana@gmail.com', '123456', 'ROLE_ADMIN');
 INSERT INTO users (id, username, password, role) VALUES (101, 'bia@gmail.com', '123456', 'ROLE_CLIENT');
 INSERT INTO users (id, username, password, role) VALUES (102, 'bob@gmail.com', '123456', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (103, 'alice@gmail.com', 'abc123', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (104, 'charlie@gmail.com', 'pass12', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (105, 'david@gmail.com', 'qwerty', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (106, 'emma@gmail.com', 'secure', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (107, 'frank@gmail.com', 'pass01', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (108, 'grace@gmail.com', 'let123', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (109, 'henry@gmail.com', 'test56', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (110, 'isabel@gmail.com', 'admin9', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (111, 'jackson@gmail.com', 'myp456', 'ROLE_CLIENT');
+INSERT INTO users (id, username, password, role) VALUES (112, 'kate@gmail.com', '123abc', 'ROLE_CLIENT');
