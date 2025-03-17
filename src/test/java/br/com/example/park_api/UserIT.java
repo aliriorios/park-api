@@ -11,6 +11,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
+import java.util.List;
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) //Tomcat em ambiente de testes do spring
 @Sql(scripts = "/sql/users/users-insert.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
 @Sql(scripts = "/sql/users/users-delete.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
@@ -41,7 +43,7 @@ public class UserIT {
     }
 
     @Test // Username conflict test
-    public void createUser_UsernameDuplicateConflict_ReturnErrorMessageStatus409(){
+    public void createUser_UsernameDuplicateConflict_ReturnErrorMessageWithStatus409(){
         // The username in this test already exist in test/resources/sql/users/users-insert.sql
 
         ErrorMessage responseBody = testClient
@@ -59,7 +61,7 @@ public class UserIT {
     }
 
     @Test // Username validation test
-    public void createUser_InvalidUsername_ReturnErrorMessageStatus422(){
+    public void createUser_InvalidUsername_ReturnErrorMessageWithStatus422(){
         // Empty username
         ErrorMessage responseBody = testClient
                 .post()
@@ -104,7 +106,7 @@ public class UserIT {
     }
 
     @Test // Password validation test
-    public void createUser_InvalidPassword_ReturnErrorMessageStatus422(){
+    public void createUser_InvalidPassword_ReturnErrorMessageWithStatus422(){
         // Empty password
         ErrorMessage responseBody = testClient
                 .post()
@@ -149,7 +151,7 @@ public class UserIT {
     }
 
     @Test // Successfully test
-    public void findUserById_IdValidate_ReturnFindUserStatus200() {
+    public void findUserById_IdValidate_ReturnFindUserWithStatus200() {
         UserResponseDto responseBody = testClient
                 .get()
                 .uri("/api/v1/users/101") // id to find
@@ -163,7 +165,7 @@ public class UserIT {
     }
 
     @Test // User not found; user not exist
-    public void findUserById_IdNotExist_ReturnErrorMessageStatus404() {
+    public void findUserById_IdNotExist_ReturnErrorMessageWithStatus404() {
         ErrorMessage responseBody = testClient
                 .get()
                 .uri("/api/v1/users/200") // id to find
@@ -174,6 +176,23 @@ public class UserIT {
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
+    }
+
+    @Test // Find all users (list)
+    public void findAll_ListWithAllUsers_ReturnAllUsersListWithStatus200() {
+        List<UserResponseDto> responseBody = testClient
+                .get()
+                .uri("/api/v1/users")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBodyList(UserResponseDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody)
+                .isNotNull()
+                .isNotEmpty()
+                .allSatisfy(user -> org.assertj.core.api.Assertions.assertThat(user.getId()).isNotNull())
+                .hasSize(13);
     }
 
     @Test // Successfully test
@@ -187,7 +206,7 @@ public class UserIT {
     }
 
     @Test // Password unauthorized
-    public void updatePassword_UnauthorizedPassword_ReturnErrorMessageStatus401(){
+    public void updatePassword_UnauthorizedPassword_ReturnErrorMessageWithStatus401(){
         // Unmatched password confirmation
         ErrorMessage responseBody = testClient
                 .patch()
@@ -218,7 +237,7 @@ public class UserIT {
     }
 
     @Test // User not found; user not exist
-    public void updatePassword_IdNotExist_ReturnErrorMessageStatus404(){
+    public void updatePassword_IdNotExist_ReturnErrorMessageWithStatus404(){
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/0")
@@ -234,7 +253,7 @@ public class UserIT {
     }
 
     @Test // Password validation test
-    public void updatePassword_InvalidPasswordInputs_ReturnErrorMessageStatus422(){
+    public void updatePassword_InvalidPasswordInputs_ReturnErrorMessageWithStatus422(){
         // Empty password
         ErrorMessage responseBody = testClient
                 .patch()
