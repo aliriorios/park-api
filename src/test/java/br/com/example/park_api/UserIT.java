@@ -25,7 +25,7 @@ public class UserIT {
         UserResponseDto responseBody = testClient
                 .post() // http method
                 .uri("/api/v1/users/save") // method uri
-                .contentType(MediaType.APPLICATION_JSON) // response archive type
+                .contentType(MediaType.APPLICATION_JSON) // request archive type
                 .bodyValue(new UserCreateDto("tody@gmail.com", "123456")) // request body
                 .exchange() // response
                 .expectStatus().isCreated() // status code 201
@@ -145,5 +145,33 @@ public class UserIT {
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
+    }
+
+    @Test // Successfully test
+    public void findUserById_IdValidate_ReturnFindUserStatus200() {
+        UserResponseDto responseBody = testClient
+                .get()
+                .uri("/api/v1/users/101") // id to find
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponseDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+    }
+
+    @Test // User not found; user not exist
+    public void findUserById_IdNotExist_ReturnErrorMessageStatus404() {
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("/api/v1/users/200") // id to find
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
 }
