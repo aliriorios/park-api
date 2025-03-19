@@ -1,7 +1,9 @@
 # Test Database Config
 spring:
+  profile:
+    active: test
   datasource:
-    url: jdbc:mysql://localhost:3306/park-api-db-test?useSSL=false&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3307/park-api-db-test?useSSL=false&allowPublicKeyRetrieval=true
     username: alirio-dev
     password: dev
     driver-class-name: com.mysql.cj.jdbc.Driver
