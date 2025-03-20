@@ -1,6 +1,7 @@
 package br.com.example.park_api.service;
 
 import br.com.example.park_api.entity.User;
+import br.com.example.park_api.entity.enums.Role;
 import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.exception.PasswordInvalidException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
@@ -37,6 +38,13 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public User findByUsername (String username) {
+        return userRepository.findByUsername(username).orElseThrow(
+                () -> new EntityNotFoundException(String.format("User {username=%s} not founded.", username))
+        );
+    }
+
+    @Transactional(readOnly = true)
     public List<User> findAll() {
         return userRepository.findAll();
     }
@@ -59,5 +67,10 @@ public class UserService {
         * userRepository.save(user);
         * This is functional but unnecessary, Hibernate updates
         * */
+    }
+
+    @Transactional(readOnly = true)
+    public Role findRoleByUsername(String username) {
+        return userRepository.findRoleByUsername(username);
     }
 }
