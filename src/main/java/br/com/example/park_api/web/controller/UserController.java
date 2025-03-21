@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "api/v1/users")
+@RequestMapping(value = "/api/v1/users")
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Contains all operations related to the resources for registering, editing and reading a user.")
 public class UserController {
