@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.Objects;
 
 @Slf4j
 public class JwtUtils {
@@ -42,7 +43,7 @@ public class JwtUtils {
 
     // Get username from token
     public static String getUsernameFromToken(String token) {
-        return getClaimsFromToken(token).getSubject();
+        return Objects.requireNonNull(getClaimsFromToken(token)).getSubject();
     }
 
     // Verifies that the token is valid
@@ -52,6 +53,8 @@ public class JwtUtils {
                     .verifyWith(generateKey())
                     .build()
                     .parseSignedClaims(refactorToken(token));
+
+            return true;
 
         } catch (JwtException e) {
             log.error(String.format("Invalid token %s", e.getMessage()));
@@ -67,7 +70,7 @@ public class JwtUtils {
     // Token expire date calculator
     private static Date toExpireDate(Date start) {
         LocalDateTime dateTime = start.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        LocalDateTime end = dateTime.plusDays(EXPIRE_DAYS).plusHours(EXPIRE_HOURS).minusMinutes(EXPIRE_MINUTES);
+        LocalDateTime end = dateTime.plusDays(EXPIRE_DAYS).plusHours(EXPIRE_HOURS).plusMinutes(EXPIRE_MINUTES);
         return Date.from(end.atZone(ZoneId.systemDefault()).toInstant());
     }
 
