@@ -36,19 +36,24 @@ public class User implements Serializable {
     @Column(name = "role", nullable = false, length = 25)
     private Role role = Role.ROLE_CLIENT;
 
+    // Auditor Aware fields -------------------------------
     @Column(name = "created_date")
+    @Setter(AccessLevel.NONE)
     @CreatedDate // JPA Auditing
     private LocalDateTime createdDate;
 
     @Column(name = "modified_date")
+    @Setter(AccessLevel.NONE)
     @LastModifiedDate // JPA Auditing
     private LocalDateTime modifiedDate;
 
     @Column(name = "created_by")
+    @Setter(AccessLevel.NONE)
     @CreatedBy // JPA Auditing
     private String createdBy;
 
     @Column(name = "modified_by")
+    @Setter(AccessLevel.NONE)
     @LastModifiedBy // JPA Auditing
     private String modifiedBy;
 }
