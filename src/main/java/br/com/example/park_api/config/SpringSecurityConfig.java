@@ -1,6 +1,7 @@
 package br.com.example.park_api.config;
 
 import br.com.example.park_api.jwt.JwtAuthorizationFilter;
+import br.com.example.park_api.jwt.JwtUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -22,6 +23,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @EnableWebMvc
 @EnableMethodSecurity
 public class SpringSecurityConfig {
+    private JwtUserDetailsService detailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -34,7 +36,7 @@ public class SpringSecurityConfig {
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/auth")).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthorizationFilter(detailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -49,7 +51,8 @@ public class SpringSecurityConfig {
     }
 
     @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter();
+    public JwtAuthorizationFilter jwtAuthorizationFilter(JwtUserDetailsService detailsService) {
+        this.detailsService = detailsService;
+        return new JwtAuthorizationFilter(detailsService);
     }
 }
