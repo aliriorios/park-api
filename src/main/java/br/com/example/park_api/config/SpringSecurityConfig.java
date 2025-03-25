@@ -1,5 +1,6 @@
 package br.com.example.park_api.config;
 
+import br.com.example.park_api.jwt.JwtAuthenticationEntryPoint;
 import br.com.example.park_api.jwt.JwtAuthorizationFilter;
 import br.com.example.park_api.jwt.JwtUserDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ public class SpringSecurityConfig {
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthorizationFilter(detailsService), UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(e -> e.authenticationEntryPoint(new JwtAuthenticationEntryPoint())) // For exceptions when the user is not authenticated
                 .build();
     }
 
