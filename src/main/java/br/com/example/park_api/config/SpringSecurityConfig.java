@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -32,9 +33,21 @@ public class SpringSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/users/save")).permitAll()
                         .requestMatchers(antMatcher(HttpMethod.POST, "/api/v1/auth")).permitAll()
+                        .requestMatchers(
+                                antMatcher(HttpMethod.POST, "/api/v1/usuarios"),
+                                antMatcher(HttpMethod.POST, "/api/v1/auth"),
+                                antMatcher("/docs-park-api.html"),
+                                antMatcher("/docs-park-api/**"),
+                                antMatcher("/swagger-ui.html"),
+                                antMatcher("/swagger-ui/**"),
+                                antMatcher("/v3/api-docs/**"),
+                                antMatcher("/swagger-resources/**"),
+                                antMatcher("/webjars/**")
+                        ).permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthorizationFilter(detailsService), UsernamePasswordAuthenticationFilter.class)
