@@ -49,8 +49,8 @@ public class ApiExceptionHandler {
     public ResponseEntity<ErrorMessage> PasswordInvalidException (RuntimeException e, HttpServletRequest request) {
         log.error("Api Error - ", e);
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ErrorMessage(request, HttpStatus.UNAUTHORIZED, e.getMessage()));
+                .body(new ErrorMessage(request, HttpStatus.BAD_REQUEST, e.getMessage()));
     }
 }
