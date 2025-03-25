@@ -53,7 +53,7 @@ public class UserController {
                     @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
     )
-    @PreAuthorize("hasRole('ADMIN') OR (hasRole('CLIENT') AND #id == authentication.principal.id)") // ADMIN and CLIENT(owner client id == PathVariable) Access Permission
+    @PreAuthorize("hasRole('ADMIN') OR (hasRole('CLIENT') AND #id == authentication.principal.id)") // ADMIN and CLIENT(own client id == PathVariable) Access Permission
     public ResponseEntity<UserResponseDto> findById (@PathVariable Long id) {
         User response = userService.findById(id);
         return ResponseEntity.ok(UserMapper.toResponseDto(response));
@@ -67,6 +67,7 @@ public class UserController {
                             content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class))))
             }
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponseDto>> findAll () {
         List<User> usersList = userService.findAll();
 
@@ -83,6 +84,7 @@ public class UserController {
                     @ApiResponse(responseCode = "422", description = "Resource not processed for invalid input data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
     )
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT') AND (#id == authentication.principal.id)") // Regardless of the "role", you are only authorized to change your own password
     public ResponseEntity<Void> updatePassword (@PathVariable Long id, @Valid @RequestBody UserUpdatePasswordDto dto) {
         User response = userService.updatePassword(id, dto.getCurrentPassword(), dto.getNewPassword(), dto.getConfirmPassword());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
