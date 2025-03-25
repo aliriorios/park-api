@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.NonNull;
@@ -47,9 +48,11 @@ public class UserController {
 
     @GetMapping(value = "/{id}")
     @Operation(
-            summary = "Find a user by id", description = "Feature to find an existing user via id",
+            summary = "Find a user by id", description = "Feature to find an existing user via id - Requisition requires a Bearer Token. Restricted access to ADMIN or CLIENT",
+            security = @SecurityRequirement(name = "Security"),
             responses = {
                     @ApiResponse(responseCode = "200", description = "User found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "User without permission to access this feature", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
     )
@@ -61,10 +64,11 @@ public class UserController {
 
     @GetMapping
     @Operation(
-            summary = "Search for all users", description = "Listing all system users",
+            summary = "Search for all users", description = "Listing all system users  - Requisition requires a Bearer Token. Restricted access to ADMIN",
+            security = @SecurityRequirement(name = "Security"),
             responses = {
-                    @ApiResponse(responseCode = "200", description = "All users were found",
-                            content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class))))
+                    @ApiResponse(responseCode = "200", description = "All users were found", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserResponseDto.class)))),
+                    @ApiResponse(responseCode = "403", description = "User without permission to access this feature", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
     )
     @PreAuthorize("hasRole('ADMIN')")
@@ -76,10 +80,12 @@ public class UserController {
 
     @PatchMapping(value = "/{id}")
     @Operation(
-            summary = "Update password", description = "Update a user's password",
+            summary = "Update password", description = "Update a user's password  - Requisition requires a Bearer Token. Restricted access to ADMIN or CLIENT",
+            security = @SecurityRequirement(name = "Security"),
             responses = {
                     @ApiResponse(responseCode = "204", description = "Password successfully updated", content = @Content(mediaType = "application/json", schema = @Schema(implementation = Void.class))),
                     @ApiResponse(responseCode = "400", description = "Password entered does not match the database or confirmation", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "403", description = "User without permission to access this feature", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "404", description = "User not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed for invalid input data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
