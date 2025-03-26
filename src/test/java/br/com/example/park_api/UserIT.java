@@ -157,7 +157,7 @@ public class UserIT {
         UserResponseDto responseBody = testClient
                 .get()
                 .uri("/api/v1/users/100") // id to find
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UserResponseDto.class)
@@ -171,7 +171,7 @@ public class UserIT {
         responseBody = testClient
                 .get()
                 .uri("/api/v1/users/101") // id to find
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UserResponseDto.class)
@@ -185,7 +185,7 @@ public class UserIT {
         responseBody = testClient
                 .get()
                 .uri("/api/v1/users/101") // id to find
-                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UserResponseDto.class)

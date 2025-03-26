@@ -67,7 +67,6 @@ public class SpringSecurityConfig {
 
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter(JwtUserDetailsService detailsService) {
-        this.detailsService = detailsService;
         return new JwtAuthorizationFilter(detailsService);
     }
 }
