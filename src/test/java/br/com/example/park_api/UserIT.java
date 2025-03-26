@@ -198,10 +198,26 @@ public class UserIT {
     }
 
     @Test // User not found; user not exist
+    public void findUserById_ResourceForbiddenClientSearchOtherClient_ReturnErrorMessageWithStatus403() {
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("/api/v1/users/102") // id to find
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+    }
+
+    @Test // User not found; user not exist
     public void findUserById_IdNotExist_ReturnErrorMessageWithStatus404() {
         ErrorMessage responseBody = testClient
                 .get()
                 .uri("/api/v1/users/200") // id to find
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isNotFound()
                 .expectBody(ErrorMessage.class)
