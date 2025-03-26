@@ -156,7 +156,8 @@ public class UserIT {
     public void findUserById_IdValidate_ReturnFindUserWithStatus200() {
         UserResponseDto responseBody = testClient
                 .get()
-                .uri("/api/v1/users/101") // id to find
+                .uri("/api/v1/users/100") // id to find
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(UserResponseDto.class)
@@ -164,6 +165,36 @@ public class UserIT {
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getUsername()).isEqualTo("ana@gmail.com");
+        org.assertj.core.api.Assertions.assertThat(responseBody.getRole()).isEqualTo("ADMIN");
+
+        responseBody = testClient
+                .get()
+                .uri("/api/v1/users/101") // id to find
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponseDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getUsername()).isEqualTo("bia@gmail.com");
+        org.assertj.core.api.Assertions.assertThat(responseBody.getRole()).isEqualTo("CLIENT");
+
+        responseBody = testClient
+                .get()
+                .uri("/api/v1/users/101") // id to find
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "$2a$12$mW2Gn0C61bbqr6TxOCg9kud0clFm99BRRY.jKKEvZW2U5iuE9Z356"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(UserResponseDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getUsername()).isEqualTo("bia@gmail.com");
+        org.assertj.core.api.Assertions.assertThat(responseBody.getRole()).isEqualTo("CLIENT");
     }
 
     @Test // User not found; user not exist
