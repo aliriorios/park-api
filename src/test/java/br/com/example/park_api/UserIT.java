@@ -264,34 +264,36 @@ public class UserIT {
     }
 
     @Test // Password unauthorized
-    public void updatePassword_UnauthorizedPassword_ReturnErrorMessageWithStatus401(){
+    public void updatePassword_WrongPassword_ReturnErrorMessageWithStatus400(){
         // Unmatched password confirmation
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserUpdatePasswordDto("123456", "123456", "000000"))
                 .exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isBadRequest()
                 .expectBody(ErrorMessage.class)
                 .returnResult().getResponseBody();
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(401);
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
 
         // Unmatched current password
         responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserUpdatePasswordDto("000000", "123456", "123456"))
                 .exchange()
-                .expectStatus().isUnauthorized()
+                .expectStatus().isBadRequest()
                 .expectBody(ErrorMessage.class)
                 .returnResult().getResponseBody();
 
         org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
-        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(401);
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(400);
     }
 
     @Test // Update password resource forbidden
@@ -331,6 +333,7 @@ public class UserIT {
         ErrorMessage responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserUpdatePasswordDto("", "", ""))
                 .exchange()
@@ -345,6 +348,7 @@ public class UserIT {
         responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserUpdatePasswordDto("12345", "12345", "12345"))
                 .exchange()
@@ -359,6 +363,7 @@ public class UserIT {
         responseBody = testClient
                 .patch()
                 .uri("/api/v1/users/100")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(new UserUpdatePasswordDto("123456789", "123456789", "123456789"))
                 .exchange()
