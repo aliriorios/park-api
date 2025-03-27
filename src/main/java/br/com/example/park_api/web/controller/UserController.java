@@ -29,7 +29,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Users", description = "Contains all operations related to the resources for registering, editing and reading a user.")
 public class UserController {
-    @NonNull
     private final UserService userService;
 
     @PostMapping(value = "/save")

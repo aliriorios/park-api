@@ -18,7 +18,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-    @NonNull
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
