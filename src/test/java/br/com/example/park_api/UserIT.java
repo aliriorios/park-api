@@ -232,6 +232,7 @@ public class UserIT {
         List<UserResponseDto> responseBody = testClient
                 .get()
                 .uri("/api/v1/users")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(UserResponseDto.class)
@@ -242,6 +243,21 @@ public class UserIT {
                 .isNotEmpty()
                 .allSatisfy(user -> org.assertj.core.api.Assertions.assertThat(user.getId()).isNotNull())
                 .hasSize(13);
+    }
+
+    @Test // Find all users when
+    public void findAll_ForbiddenResourceToClient_ReturnErrorMessageWithStatus403() {
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("api/v1/users")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
     }
 
     @Test // Successfully test
