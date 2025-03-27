@@ -1,5 +1,6 @@
 package br.com.example.park_api.web.exception;
 
+import br.com.example.park_api.exception.CpfUniqueViolationException;
 import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.exception.PasswordInvalidException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
@@ -28,7 +29,7 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Invalid field(s)", result));
     }
 
-    @ExceptionHandler(UsernameUniqueViolationException.class)
+    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
     public ResponseEntity<ErrorMessage> UniqueViolationException (RuntimeException e, HttpServletRequest request) {
         log.error("Api Error - ", e);
 
