@@ -2,11 +2,14 @@ package br.com.example.park_api.web.controller;
 
 import br.com.example.park_api.entity.Client;
 import br.com.example.park_api.jwt.JwtUserDetails;
+import br.com.example.park_api.repository.projection.ClientProjection;
 import br.com.example.park_api.service.ClientService;
 import br.com.example.park_api.service.UserService;
 import br.com.example.park_api.web.dto.ClientCreateDto;
 import br.com.example.park_api.web.dto.ClientResponseDto;
+import br.com.example.park_api.web.dto.PageableDto;
 import br.com.example.park_api.web.dto.mapper.ClientMapper;
+import br.com.example.park_api.web.dto.mapper.PageableMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -76,9 +79,9 @@ public class ClientController {
             }
     )
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Page<Client>> findAll(Pageable pageable) { // "Pageable" and "Page"   -> Pagination
-        Page<Client> clientList = clientService.findAll(pageable);
+    public ResponseEntity<PageableDto> findAll(Pageable pageable) { // "Pageable" and "Page"   -> Pagination
+        Page<ClientProjection> clientList = clientService.findAll(pageable);
 
-        return ResponseEntity.status(HttpStatus.OK).body(clientList);
+        return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(clientList));
     }
 }
