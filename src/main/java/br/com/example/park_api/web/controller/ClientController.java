@@ -15,11 +15,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.spi.ErrorMessage;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(value = "/api/v1/clients")
@@ -61,5 +65,20 @@ public class ClientController {
     public ResponseEntity<ClientResponseDto> findById (@PathVariable Long id) {
         Client client = clientService.findById(id);
         return ResponseEntity.status(HttpStatus.OK).body(ClientMapper.toResponseDto(client));
+    }
+
+    @GetMapping
+    @Operation(
+            summary = "Search for all clients", description = "Listing all system clients  - Requisition requires a Bearer Token. Restricted access to ADMIN",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restricted to ADMIN", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Page<Client>> findAll(Pageable pageable) { // "Pageable" and "Page"   -> Pagination
+        Page<Client> clientList = clientService.findAll(pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(clientList);
     }
 }
