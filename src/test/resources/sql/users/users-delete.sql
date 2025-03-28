@@ -2,4 +2,4 @@
 -- DELETE FROM users;
 
 -- SQL --
-TRUNCATE TABLE users;
+DELETE TABLE users;

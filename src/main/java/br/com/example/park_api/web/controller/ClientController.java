@@ -7,8 +7,14 @@ import br.com.example.park_api.service.UserService;
 import br.com.example.park_api.web.dto.ClientCreateDto;
 import br.com.example.park_api.web.dto.ClientResponseDto;
 import br.com.example.park_api.web.dto.mapper.ClientMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.spi.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,11 +27,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value = "/api/v1/clients")
 @RequiredArgsConstructor
+@Tag(name = "Clients", description = "Contains all operations related to a client's resource")
 public class ClientController {
     private final ClientService clientService;
     private final UserService userService;
 
     @PostMapping(value = "/save")
+    @Operation(
+            summary = "Create a new client", description = "Feature to create a new client linked to a registered user - Requisition requires Bearer Token. Restricted access to CLIENT",
+            responses = {
+                    @ApiResponse(responseCode = "201", description = "Successfully created resource", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restricted to CLIENT", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "409", description = "CPF already registered in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "422", description = "Resource not processed for invalid input data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
     @PreAuthorize("hasRole('CLIENT')")
     public ResponseEntity<ClientResponseDto> saveClient (@Valid @RequestBody ClientCreateDto dto, @AuthenticationPrincipal JwtUserDetails userDetails) {
         Client client = ClientMapper.toClient(dto);
