@@ -19,10 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api/v1/clients")
@@ -37,7 +34,7 @@ public class ClientController {
             summary = "Create a new client", description = "Feature to create a new client linked to a registered user - Requisition requires Bearer Token. Restricted access to CLIENT",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Successfully created resource", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
-                    @ApiResponse(responseCode = "403", description = "Resource restricted to CLIENT", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restricted to CLIENT", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "409", description = "CPF already registered in the system", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
                     @ApiResponse(responseCode = "422", description = "Resource not processed for invalid input data", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
             }
@@ -49,5 +46,20 @@ public class ClientController {
 
         clientService.save(client);
         return ResponseEntity.status(HttpStatus.CREATED).body(ClientMapper.toResponseDto(client));
+    }
+
+    @GetMapping(value = "/{id}")
+    @Operation(
+            summary = "Find a client by id", description = "Feature to find an existing client by id - Requisition requires a Bearer Token. Restricted access to ADMIN",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restricted to ADMIN", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "404", description = "Client not found", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ClientResponseDto> findById (@PathVariable Long id) {
+        Client client = clientService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(ClientMapper.toResponseDto(client));
     }
 }

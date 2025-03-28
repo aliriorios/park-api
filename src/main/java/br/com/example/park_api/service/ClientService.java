@@ -2,6 +2,7 @@ package br.com.example.park_api.service;
 
 import br.com.example.park_api.entity.Client;
 import br.com.example.park_api.exception.CpfUniqueViolationException;
+import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,5 +22,12 @@ public class ClientService {
         } catch (DataIntegrityViolationException e) {
             throw new CpfUniqueViolationException(String.format("CPF {%s} is already registered in the system", client.getCpf()));
         }
+    }
+
+    @Transactional(readOnly = true)
+    public Client findById(Long id) {
+        return clientRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(String.format("Client {id=%s} not founded.", id))
+        );
     }
 }
