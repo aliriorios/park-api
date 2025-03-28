@@ -98,4 +98,19 @@ public class ClientController {
 
         return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(clientList));
     }
+
+    @GetMapping(value = "/details")
+    @Operation(
+            summary = "Find a client by user id", description = "Feature to fetch authenticated user data - Requisition requires a Bearer Token. Restricted access to CLIENT",
+            security = @SecurityRequirement(name = "Security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Client found successfully", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ClientResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restricted to CLIENT", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorMessage.class))),
+            }
+    )
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<ClientResponseDto> findDetails (@AuthenticationPrincipal JwtUserDetails userDetails) {
+        Client client = clientService.findByUserId(userDetails.getId());
+        return ResponseEntity.status(HttpStatus.OK).body(ClientMapper.toResponseDto(client));
+    }
 }

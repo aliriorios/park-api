@@ -105,6 +105,7 @@ public class ClientIT {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(422);
     }
 
+    // Find by id -----------------------------------------
     @Test
     public void findClientById_IdValidate_ReturnClientWithStatus200(){
         ClientResponseDto responseBody = testClient
@@ -162,7 +163,7 @@ public class ClientIT {
         org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(404);
     }
 
-    // Find All -------------------------------------------
+    // Find all -------------------------------------------
     @Test
     public void findAllClients_ListWithAllClients_ReturnClientsWithStatus200(){
         PageableDto responseBody = testClient
@@ -202,6 +203,38 @@ public class ClientIT {
                 .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
                 .exchange()
                 .expectStatus().isEqualTo(403)
+                .expectBody(ErrorMessage.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getStatus()).isEqualTo(403);
+    }
+
+    // Find by user id ------------------------------------
+    @Test
+    public void findClientByUserId_ClientValidate_ReturnClientWithStatus200(){
+        ClientResponseDto responseBody = testClient
+                .get()
+                .uri("/api/v1/clients/details")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(ClientResponseDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getId()).isEqualTo(10);
+    }
+
+    @Test
+    public void findClientByUserId_ResourceRestrictedToClient_ReturnErrorMessageWithStatus403(){
+        ErrorMessage responseBody = testClient
+                .get()
+                .uri("/api/v1/clients/details")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
                 .expectBody(ErrorMessage.class)
                 .returnResult().getResponseBody();
 
