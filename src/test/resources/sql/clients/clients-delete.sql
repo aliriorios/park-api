@@ -1,2 +1,2 @@
-DELETE TABLE clients;
-DELETE TABLE users;
+DELETE FROM clients;
+DELETE FROM users;
