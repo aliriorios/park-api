@@ -6,7 +6,6 @@ import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.exception.PasswordInvalidException;
 import br.com.example.park_api.exception.UsernameUniqueViolationException;
 import br.com.example.park_api.repository.UserRepository;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;

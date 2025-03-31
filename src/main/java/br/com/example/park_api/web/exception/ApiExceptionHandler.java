@@ -1,9 +1,6 @@
 package br.com.example.park_api.web.exception;
 
-import br.com.example.park_api.exception.CpfUniqueViolationException;
-import br.com.example.park_api.exception.EntityNotFoundException;
-import br.com.example.park_api.exception.PasswordInvalidException;
-import br.com.example.park_api.exception.UsernameUniqueViolationException;
+import br.com.example.park_api.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -29,7 +26,7 @@ public class ApiExceptionHandler {
                 .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Invalid field(s)", result));
     }
 
-    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class})
+    @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class, ParkingSpotCodeUniqueViolationException.class})
     public ResponseEntity<ErrorMessage> UniqueViolationException (RuntimeException e, HttpServletRequest request) {
         log.error("Api Error - ", e);
 
