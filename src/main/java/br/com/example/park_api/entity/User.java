@@ -11,22 +11,22 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter @Setter @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @ToString(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class) // Enabling the Entity for the Audit Process
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    @EqualsAndHashCode.Include
     @ToString.Include
     private Long id;
 
     @Column(name = "username", nullable = false, unique = true, length = 100)
+    @ToString.Include
     private String username;
 
     @Column(name = "password", nullable = false)
@@ -56,4 +56,18 @@ public class User implements Serializable {
     @Setter(AccessLevel.NONE)
     @LastModifiedBy // JPA Auditing
     private String modifiedBy;
+
+    // Equals and HashCode --------------------------------
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        User user = (User) object;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
 }
