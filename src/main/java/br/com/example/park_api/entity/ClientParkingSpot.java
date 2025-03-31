@@ -9,32 +9,59 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
-@Table(name = "clients")
+@Table(name = "client_parking_spot")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
 @EntityListeners(AuditingEntityListener.class)
-public class Client implements Serializable {
+public class ClientParkingSpot implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     @ToString.Include
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "receipt_number", nullable = false, unique = true, length = 15)
     @ToString.Include
-    private String name;
+    private String receipt;
 
-    @Column(name = "cpf", nullable = false, unique = true, length = 11)
-    private String cpf;
+    @Column(name = "licence_plate", nullable = false, length = 8)
+    private String licencePlate;
+
+    @Column(name = "manufacturer", nullable = false, length = 45)
+    private String manufacturer;
+
+    @Column(name = "model", nullable = false, length = 45)
+    private String model;
+
+    @Column(name = "color", nullable = false, length = 45)
+    private String color;
+
+    @Column(name = "check_in", nullable = false)
+    @ToString.Include
+    private LocalDateTime checkIn;
+
+    @Column(name = "check_out")
+    @ToString.Include
+    private LocalDateTime checkOut;
+
+    @Column(name = "value", columnDefinition = "decimal(7,2)")
+    private BigDecimal value;
+
+    @Column(name = "value", columnDefinition = "decimal(7,2)")
+    private BigDecimal discount;
 
     // Relationship - Foreign Key -------------------------
-    @OneToOne
-    @JoinColumn(name = "id_user", nullable = false)
-    private User user;
+    @ManyToOne
+    @JoinColumn(name = "id_client", nullable = false)
+    private Client client;
+
+    @ManyToOne
+    @JoinColumn(name = "id_parking_spot", nullable = false)
+    private ParkingSpot parkingSpot;
 
     // Auditor Aware fields -------------------------------
     @Column(name = "created_date")
@@ -62,8 +89,8 @@ public class Client implements Serializable {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Client client = (Client) object;
-        return Objects.equals(id, client.id);
+        ClientParkingSpot that = (ClientParkingSpot) object;
+        return Objects.equals(id, that.id);
     }
 
     @Override
