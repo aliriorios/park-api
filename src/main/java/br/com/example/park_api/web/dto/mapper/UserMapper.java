@@ -3,12 +3,15 @@ package br.com.example.park_api.web.dto.mapper;
 import br.com.example.park_api.entity.User;
 import br.com.example.park_api.web.dto.UserCreateDto;
 import br.com.example.park_api.web.dto.UserResponseDto;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
 
     public static User toUser(UserCreateDto createDto) {
