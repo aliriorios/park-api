@@ -24,6 +24,8 @@ spring:
 springdoc:
   swagger-ui:
     path: /docs-park-api.html
+    operations-sorter: alpha
+    tags-sorter: alpha
   api-docs:
     path: /docs-park-api
   packagesToScan: br.com.example.park_api.web.controller
