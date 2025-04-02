@@ -23,4 +23,9 @@ public class ClientParkingSpotService {
                 () -> new EntityNotFoundException(String.format("Receipt {%s} not found in the system, or has already been checked out", receipt))
         );
     }
+
+    @Transactional
+    public long getTotalCountCompleteParking(String cpf) {
+        return repository.countByClientCpfAndCheckOutIsNotNull(cpf);
+    }
 }

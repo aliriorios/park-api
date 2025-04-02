@@ -8,8 +8,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import static br.com.example.park_api.entity.enums.SpotStatus.FREE;
 import static br.com.example.park_api.entity.enums.SpotStatus.OCCUPIED;
 
 @Service
@@ -33,5 +35,23 @@ public class ParkingService {
         clientParkingSpot.setReceipt(ParkingUtils.generateReceipt());
 
         return clientParkingSpotService.save(clientParkingSpot);
+    }
+
+    @Transactional
+    public ClientParkingSpot checkOut(String receipt) {
+        ClientParkingSpot clientParkingSpot = clientParkingSpotService.findByReceipt(receipt);
+
+        LocalDateTime checkOutDate = LocalDateTime.now();
+        BigDecimal value = ParkingUtils.calculateCost(clientParkingSpot.getCheckIn(), checkOutDate);
+        clientParkingSpot.setValue(value);
+
+        long count = clientParkingSpotService.getTotalCountCompleteParking(clientParkingSpot.getClient().getCpf());
+        BigDecimal discount = ParkingUtils.calculateDiscount(value, count);
+        clientParkingSpot.setDiscount(discount);
+
+        clientParkingSpot.setCheckOut(checkOutDate);
+        clientParkingSpot.getParkingSpot().setStatus(FREE);
+
+        return clientParkingSpotService.save(clientParkingSpot); // Update
     }
 }
