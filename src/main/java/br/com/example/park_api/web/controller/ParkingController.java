@@ -1,6 +1,7 @@
 package br.com.example.park_api.web.controller;
 
 import br.com.example.park_api.entity.ClientParkingSpot;
+import br.com.example.park_api.service.ClientParkingSpotService;
 import br.com.example.park_api.service.ParkingService;
 import br.com.example.park_api.web.dto.ParkingCreateDto;
 import br.com.example.park_api.web.dto.ParkingResponseDto;
@@ -19,10 +20,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -33,6 +31,7 @@ import java.net.URI;
 @Tag(name = "Parking", description = "Registration operations for entering and exiting a vehicle from the parking lot")
 public class ParkingController {
     private final ParkingService parkingService;
+    private final ClientParkingSpotService clientParkingSpotService;
 
     @PostMapping(value = "/check-in")
     @PreAuthorize("hasRole('ADMIN')")
@@ -61,5 +60,14 @@ public class ParkingController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(HttpHeaders.LOCATION, location.toString())
                 .body(responseDto);
+    }
+
+    @GetMapping(value = "/check-in/{receipt}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
+    public ResponseEntity<ParkingResponseDto> findByReceipt(@PathVariable String receipt) {
+        ClientParkingSpot clientParkingSpot = clientParkingSpotService.findByReceipt(receipt);
+        ParkingResponseDto dto = ClientParkingSpotMapper.toResponseDto(clientParkingSpot);
+
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 }
