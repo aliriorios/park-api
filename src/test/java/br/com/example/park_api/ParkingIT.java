@@ -18,6 +18,7 @@ public class ParkingIT {
     @Autowired
     WebTestClient testClient;
 
+    // save -----------------------------------------------
     @Test
     public void CreateCheckIn_ValidateData_ReturnCreatedAndLocation() {
         ParkingCreateDto createDto = ParkingCreateDto.builder()
@@ -129,5 +130,61 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("422")
                 .jsonPath("path").isEqualTo("/api/v1/parking/check-in")
                 .jsonPath("method").isEqualTo("POST");
+    }
+
+    // find -----------------------------------------------
+    @Test
+    public void FindByReceipt_RoleAdmin_ReturnStatus200() {
+        testClient
+                .get()
+                .uri("/api/v1/parking/check-in/20230313-101300")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("licencePlate").isEqualTo("FIT-1020")
+                .jsonPath("manufacturer").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("GREEN")
+                .jsonPath("clientCpf").isEqualTo("98401203015")
+                .jsonPath("receipt").isEqualTo("20230313-101300")
+                .jsonPath("checkIn").isEqualTo("2023-03-13 10:15:00")
+                .jsonPath("parkingSpotCode").isEqualTo("A-01");
+
+    }
+
+    @Test
+    public void FindByReceipt_RoleClient_ReturnStatus200() {
+        testClient
+                .get()
+                .uri("/api/v1/parking/check-in/20230313-101300")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("licencePlate").isEqualTo("FIT-1020")
+                .jsonPath("manufacturer").isEqualTo("FIAT")
+                .jsonPath("model").isEqualTo("PALIO")
+                .jsonPath("color").isEqualTo("GREEN")
+                .jsonPath("clientCpf").isEqualTo("98401203015")
+                .jsonPath("receipt").isEqualTo("20230313-101300")
+                .jsonPath("checkIn").isEqualTo("2023-03-13 10:15:00")
+                .jsonPath("parkingSpotCode").isEqualTo("A-01");
+
+    }
+
+    @Test
+    public void FindByReceipt_ReceiptNotExist_ReturnErrorStatus404() {
+        testClient
+                .get()
+                .uri("/api/v1/parking/check-in/20230313-999999")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bob@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking/check-in/20230313-999999")
+                .jsonPath("method").isEqualTo("GET");
+
     }
 }
