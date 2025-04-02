@@ -3,9 +3,13 @@ package br.com.example.park_api.service;
 import br.com.example.park_api.entity.ClientParkingSpot;
 import br.com.example.park_api.exception.EntityNotFoundException;
 import br.com.example.park_api.repository.ClientParkingSpotRepository;
+import br.com.example.park_api.repository.projection.ClientParkingSpotProjection;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +31,10 @@ public class ClientParkingSpotService {
     @Transactional
     public long getTotalCountCompleteParking(String cpf) {
         return repository.countByClientCpfAndCheckOutIsNotNull(cpf);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ClientParkingSpotProjection> findAllByClientCpf(String cpf, Pageable pageable) {
+        return repository.findAllByClientCpf(cpf, pageable);
     }
 }

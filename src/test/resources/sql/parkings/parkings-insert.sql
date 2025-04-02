@@ -15,6 +15,6 @@ INSERT INTO parking_spots (id, spot_code, status) VALUES
 (500, 'A-05', 'FREE');
 
 INSERT INTO client_parking_spot (receipt_number, licence_plate, manufacturer, model, color, check_in, id_client, id_parking_spot) VALUES
-('20230313-101300', 'FIT-1020', 'FIAT', 'PALIO', 'GREEN', '2023-03-13 10:15:00', 22, 100),
-('20230314-101400', 'SIE-1020', 'FIAT', 'SIENA', 'WHITE', '2023-03-14 10:14:00', 21, 200),
-('20230315-101500', 'FIT-1020', 'FIAT', 'PALIO', 'VERDE', '2023-03-14 10:15:00', 22, 300);
+('20230313-101300', 'FIT-1020', 'FIAT', 'PALIO', 'GREEN', '2025-03-13 10:15:00', 22, 100),
+('20230314-101400', 'SIE-1020', 'FIAT', 'SIENA', 'WHITE', '2025-03-14 10:14:00', 21, 200),
+('20230315-101500', 'FIT-1020', 'FIAT', 'PALIO', 'VERDE', '2025-03-14 10:15:00', 22, 300);

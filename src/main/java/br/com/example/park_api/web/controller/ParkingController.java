@@ -1,11 +1,14 @@
 package br.com.example.park_api.web.controller;
 
 import br.com.example.park_api.entity.ClientParkingSpot;
+import br.com.example.park_api.repository.projection.ClientParkingSpotProjection;
 import br.com.example.park_api.service.ClientParkingSpotService;
 import br.com.example.park_api.service.ParkingService;
+import br.com.example.park_api.web.dto.PageableDto;
 import br.com.example.park_api.web.dto.ParkingCreateDto;
 import br.com.example.park_api.web.dto.ParkingResponseDto;
 import br.com.example.park_api.web.dto.mapper.ClientParkingSpotMapper;
+import br.com.example.park_api.web.dto.mapper.PageableMapper;
 import br.com.example.park_api.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -16,6 +19,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +29,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.awt.print.Pageable;
 import java.net.URI;
 
 @RestController
@@ -64,6 +71,14 @@ public class ParkingController {
 
     @GetMapping(value = "/check-in/{receipt}")
     @PreAuthorize("hasAnyRole('ADMIN', 'CLIENT')")
+    @Operation(
+            summary = "Check-in operation", description = "Feature to find a check-in record- Request requires the use of a Bearer JWT Token. Restricted ADMIN and CLIENT access",
+            security = @SecurityRequirement(name = "Security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully founded", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "404", description = "Non-existent receipt number", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
     public ResponseEntity<ParkingResponseDto> findByReceipt(@PathVariable String receipt) {
         ClientParkingSpot clientParkingSpot = clientParkingSpotService.findByReceipt(receipt);
         ParkingResponseDto dto = ClientParkingSpotMapper.toResponseDto(clientParkingSpot);
@@ -73,11 +88,28 @@ public class ParkingController {
 
     @PutMapping(value = "/check-out/{receipt}")
     @PreAuthorize("hasAnyRole('ADMIN')")
+    @Operation(
+            summary = "Check-out operation", description = "Feature to exit a vehicle from the parking lot - Request requires the use of a Bearer JWT Token. Restricted ADMIN access",
+            security = @SecurityRequirement(name = "Security"),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully updated feature", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ParkingResponseDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restrict to ADMIN", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "404", description = "Causes:<br/>" + "- Non-existent receipt number<br/>" + "- The vehicle has already passed check-out", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
     public ResponseEntity<ParkingResponseDto> checkOut(@PathVariable String receipt) {
         ClientParkingSpot clientParkingSpot = parkingService.checkOut(receipt);
 
         ParkingResponseDto dto = ClientParkingSpotMapper.toResponseDto(clientParkingSpot);
 
         return ResponseEntity.status(HttpStatus.OK).body(dto);
+    }
+
+    @GetMapping(value = "/cpf/{cpf}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PageableDto> findAllParkingByCpf(@PathVariable String cpf, @PageableDefault(size = 5, sort = "checkIn", direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<ClientParkingSpotProjection> projection = clientParkingSpotService.findAllByClientCpf(cpf, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(projection));
     }
 }
