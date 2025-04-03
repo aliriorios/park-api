@@ -1,6 +1,7 @@
 package br.com.example.park_api.web.controller;
 
 import br.com.example.park_api.entity.ClientParkingSpot;
+import br.com.example.park_api.jwt.JwtUserDetails;
 import br.com.example.park_api.repository.projection.ClientParkingSpotProjection;
 import br.com.example.park_api.service.ClientParkingSpotService;
 import br.com.example.park_api.service.ParkingService;
@@ -29,6 +30,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -129,6 +131,27 @@ public class ParkingController {
     )
     public ResponseEntity<PageableDto> findAllParkingByCpf(@PathVariable String cpf, @Parameter(hidden = true) @PageableDefault(size = 5, sort = "checkIn", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<ClientParkingSpotProjection> projection = clientParkingSpotService.findAllByClientCpf(cpf, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(projection));
+    }
+
+    @GetMapping
+    @PreAuthorize("hasRole('CLIENT')")
+    @Operation(
+            summary = "Find the parking records of the logged-in client", description = "Find the parking records of the logged-in client - Request requires the use of a Bearer JWT Token. Restricted CLIENT access",
+            security = @SecurityRequirement(name = "Security"),
+            parameters = {
+                    @Parameter(in = QUERY, name = "page", description = "Represents the page returned", content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))),
+                    @Parameter(in = QUERY, name = "size", description = "Represents the total number of elements per page", content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))),
+                    @Parameter(in = QUERY, name = "sort", description = "Default sorting field 'checkIn.asc'", array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "checkIn.asc")), hidden = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource successfully found", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = PageableDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restrict to CLIENT", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class))),
+            }
+    )
+    public ResponseEntity<PageableDto> findAllParkingClient(@AuthenticationPrincipal JwtUserDetails userDetails, @Parameter(hidden = true) @PageableDefault(size = 5, sort = "checkIn", direction = Sort.Direction.ASC) Pageable pageable) {
+        Page<ClientParkingSpotProjection> projection = clientParkingSpotService.findAllByUserId(userDetails.getId(), pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(projection));
     }
