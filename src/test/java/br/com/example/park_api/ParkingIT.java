@@ -1,5 +1,6 @@
 package br.com.example.park_api;
 
+import br.com.example.park_api.web.dto.PageableDto;
 import br.com.example.park_api.web.dto.ParkingCreateDto;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -148,7 +149,7 @@ public class ParkingIT {
                 .jsonPath("color").isEqualTo("GREEN")
                 .jsonPath("clientCpf").isEqualTo("98401203015")
                 .jsonPath("receipt").isEqualTo("20230313-101300")
-                .jsonPath("checkIn").isEqualTo("2023-03-13 10:15:00")
+                .jsonPath("checkIn").isEqualTo("2025-03-13 10:15:00")
                 .jsonPath("parkingSpotCode").isEqualTo("A-01");
 
     }
@@ -237,5 +238,67 @@ public class ParkingIT {
                 .jsonPath("status").isEqualTo("404")
                 .jsonPath("path").isEqualTo("/api/v1/parking/check-out/20230313-000000")
                 .jsonPath("method").isEqualTo("PUT");
+    }
+
+    // findAllParkingByCpf --------------------------------
+    @Test
+    public void FindAllParkingByCpf_SuccessfullyFounded_ReturnStatus200() {
+        PageableDto responseBody = testClient
+                .get()
+                .uri("/api/v1/parking/cpf/{cpf}?size=1&page=0", "98401203015")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1); // Current Page Elements
+        org.assertj.core.api.Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2); // 2 elements, 1 for page = 2 pages
+        org.assertj.core.api.Assertions.assertThat(responseBody.getNumber()).isEqualTo(0); // Number of pages
+        org.assertj.core.api.Assertions.assertThat(responseBody.getSize()).isEqualTo(1); // Number of elements per page
+
+        responseBody = testClient
+                .get()
+                .uri("/api/v1/parking/cpf/{cpf}?size=1&page=1", "98401203015")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(PageableDto.class)
+                .returnResult().getResponseBody();
+
+        org.assertj.core.api.Assertions.assertThat(responseBody).isNotNull();
+        org.assertj.core.api.Assertions.assertThat(responseBody.getContent().size()).isEqualTo(1); // Current Page Elements
+        org.assertj.core.api.Assertions.assertThat(responseBody.getTotalPages()).isEqualTo(2); // 2 elements, 1 for page = 2 pages
+        org.assertj.core.api.Assertions.assertThat(responseBody.getNumber()).isEqualTo(1); // Number of pages
+        org.assertj.core.api.Assertions.assertThat(responseBody.getSize()).isEqualTo(1); // Number of elements per page
+    }
+
+    @Test
+    public void FindAllParkingByCpf_RoleClient_ReturnErrorStatus403() {
+        testClient
+                .get()
+                .uri("/api/v1/parking/cpf/{cpf}", "98401203015")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "bia@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isForbidden()
+                .expectBody()
+                .jsonPath("status").isEqualTo("403")
+                .jsonPath("path").isEqualTo("/api/v1/parking/cpf/98401203015")
+                .jsonPath("method").isEqualTo("GET");
+    }
+
+    @Test
+    public void FindAllParkingByCpf_CpfNotExist_ReturnErrorStatus404() {
+        testClient
+                .get()
+                .uri("/api/v1/parking/cpf/{cpf}", "95235416090")
+                .headers(JwtAuthentication.getHeaderAuthorization(testClient, "ana@gmail.com", "123456"))
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody()
+                .jsonPath("status").isEqualTo("404")
+                .jsonPath("path").isEqualTo("/api/v1/parking/cpf/95235416090")
+                .jsonPath("method").isEqualTo("GET");
     }
 }

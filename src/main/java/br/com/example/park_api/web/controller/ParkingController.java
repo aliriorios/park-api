@@ -11,7 +11,9 @@ import br.com.example.park_api.web.dto.mapper.ClientParkingSpotMapper;
 import br.com.example.park_api.web.dto.mapper.PageableMapper;
 import br.com.example.park_api.web.exception.ErrorMessage;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.headers.Header;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
@@ -29,8 +32,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.awt.print.Pageable;
 import java.net.URI;
+
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
+import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 
 @RestController
 @RequestMapping(value = "/api/v1/parking")
@@ -107,7 +112,22 @@ public class ParkingController {
 
     @GetMapping(value = "/cpf/{cpf}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<PageableDto> findAllParkingByCpf(@PathVariable String cpf, @PageableDefault(size = 5, sort = "checkIn", direction = Sort.Direction.ASC) Pageable pageable) {
+    @Operation(
+            summary = "Find client parking records by CPF", description = "Find all client parking records by CPF - Request requires the use of a Bearer JWT Token. Restricted ADMIN access",
+            security = @SecurityRequirement(name = "Security"),
+            parameters = {
+                    @Parameter(in = PATH, name = "cpf", description = "CPF number for the client to be consulted", required = true),
+                    @Parameter(in = QUERY, name = "page", description = "Represents the page returned", content = @Content(schema = @Schema(type = "integer", defaultValue = "0"))),
+                    @Parameter(in = QUERY, name = "size", description = "Represents the total number of elements per page", content = @Content(schema = @Schema(type = "integer", defaultValue = "5"))),
+                    @Parameter(in = QUERY, name = "sort", description = "Default sorting field 'checkIn.asc'", array = @ArraySchema(schema = @Schema(type = "string", defaultValue = "checkIn.asc")), hidden = true)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Resource successfully found", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = PageableDto.class))),
+                    @ApiResponse(responseCode = "403", description = "Resource restrict to ADMIN", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class))),
+                    @ApiResponse(responseCode = "404", description = "Client CPF does not exist in the system", content = @Content(mediaType = "application/json;charset=UTF-8", schema = @Schema(implementation = ErrorMessage.class)))
+            }
+    )
+    public ResponseEntity<PageableDto> findAllParkingByCpf(@PathVariable String cpf, @Parameter(hidden = true) @PageableDefault(size = 5, sort = "checkIn", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<ClientParkingSpotProjection> projection = clientParkingSpotService.findAllByClientCpf(cpf, pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(projection));

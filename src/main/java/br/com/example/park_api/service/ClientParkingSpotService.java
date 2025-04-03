@@ -6,14 +6,14 @@ import br.com.example.park_api.repository.ClientParkingSpotRepository;
 import br.com.example.park_api.repository.projection.ClientParkingSpotProjection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.awt.print.Pageable;
 
 @Service
 @RequiredArgsConstructor
 public class ClientParkingSpotService {
+    private final ClientService clientService;
     private final ClientParkingSpotRepository repository;
 
     @Transactional
@@ -35,6 +35,6 @@ public class ClientParkingSpotService {
 
     @Transactional(readOnly = true)
     public Page<ClientParkingSpotProjection> findAllByClientCpf(String cpf, Pageable pageable) {
-        return repository.findAllByClientCpf(cpf, pageable);
+        return repository.findAllByClientCpf(clientService.findByCpf(cpf).getCpf(), pageable);
     }
 }
