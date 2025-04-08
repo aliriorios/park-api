@@ -4,6 +4,8 @@ import br.com.example.park_api.entity.ClientParkingSpot;
 import br.com.example.park_api.jwt.JwtUserDetails;
 import br.com.example.park_api.repository.projection.ClientParkingSpotProjection;
 import br.com.example.park_api.service.ClientParkingSpotService;
+import br.com.example.park_api.service.ClientService;
+import br.com.example.park_api.service.JasperService;
 import br.com.example.park_api.service.ParkingService;
 import br.com.example.park_api.web.dto.PageableDto;
 import br.com.example.park_api.web.dto.ParkingCreateDto;
@@ -20,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,12 +31,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 
 import static io.swagger.v3.oas.annotations.enums.ParameterIn.PATH;
@@ -45,7 +50,9 @@ import static io.swagger.v3.oas.annotations.enums.ParameterIn.QUERY;
 @Tag(name = "Parking", description = "Registration operations for entering and exiting a vehicle from the parking lot")
 public class ParkingController {
     private final ParkingService parkingService;
+    private final ClientService clientService;
     private final ClientParkingSpotService clientParkingSpotService;
+    private final JasperService jasperService;
 
     @PostMapping(value = "/check-in")
     @PreAuthorize("hasRole('ADMIN')")
@@ -154,5 +161,21 @@ public class ParkingController {
         Page<ClientParkingSpotProjection> projection = clientParkingSpotService.findAllByUserId(userDetails.getId(), pageable);
 
         return ResponseEntity.status(HttpStatus.OK).body(PageableMapper.toPageableDto(projection));
+    }
+
+    // Jasper Reports
+    @GetMapping(value = "/report")
+    @PreAuthorize("hasRole('CLIENT')")
+    public ResponseEntity<Void> getJasperReports(HttpServletResponse response, @AuthenticationPrincipal JwtUserDetails userDetails) throws IOException {
+        String cpf = clientService.findByUserId(userDetails.getId()).getCpf();
+        jasperService.addParams("CPF", cpf);
+
+        byte[] bytes = jasperService.generatedPdf();
+
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader("Content-disposition", "inline; filename=" + System.currentTimeMillis() + ".pdf");
+        response.getOutputStream().write(bytes);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
