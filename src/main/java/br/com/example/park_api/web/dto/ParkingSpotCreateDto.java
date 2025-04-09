@@ -10,11 +10,11 @@ import lombok.Setter;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
 public class ParkingSpotCreateDto {
-    @NotBlank
-    @Size(min = 4, max = 4)
+    @NotBlank(message = "{NotBlank.parkingSpotCreateDto.code}")
+    @Size(min = 4, max = 4, message = "{Size.parkingSpotCreateDto.code}")
     private String code;
 
-    @NotBlank
-    @Pattern(regexp = "FREE|OCCUPIED")
+    @NotBlank(message = "{NotBlank.parkingSpotCreateDto.status}")
+    @Pattern(regexp = "FREE|OCCUPIED", message = "{Pattern.parkingSpotCreateDto.status}")
     private String status;
 }

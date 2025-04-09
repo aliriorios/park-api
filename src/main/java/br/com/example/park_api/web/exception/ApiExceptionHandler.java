@@ -2,7 +2,9 @@ package br.com.example.park_api.web.exception;
 
 import br.com.example.park_api.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +16,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice // Listener for exceptions
 @Slf4j // Lombok annotation to print message on console
+@RequiredArgsConstructor
 public class ApiExceptionHandler {
+    private final MessageSource messageSource;
+
     @ExceptionHandler(MethodArgumentNotValidException.class) // Annotation that records which exception the class should catch
     public ResponseEntity<ErrorMessage> MethodArgumentNotValidException (MethodArgumentNotValidException e,
                                                                          HttpServletRequest request,
@@ -23,7 +28,9 @@ public class ApiExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY, "Invalid field(s)", result));
+                .body(new ErrorMessage(request, HttpStatus.UNPROCESSABLE_ENTITY,
+                        messageSource.getMessage("message.invalid.field", null, request.getLocale()),
+                        result, messageSource));
     }
 
     @ExceptionHandler({UsernameUniqueViolationException.class, CpfUniqueViolationException.class, ParkingSpotCodeUniqueViolationException.class})
